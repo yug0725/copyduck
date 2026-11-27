@@ -53,6 +53,12 @@ main{max-width:860px;margin:0 auto;padding:16px}
 .label{font-size:12px;color:var(--sub);margin-bottom:2px}
 .sent{font-size:16px}
 .ko{color:var(--sub);font-size:14px}
+.shadow{display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--accent-soft)}
+.shadow .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.shadow .sh-adj .btn{min-height:34px;padding:4px 10px;font-size:13px}
+.sh-msg{font-weight:600}
+.sh-msg.rec{color:var(--bad);font-size:17px}
+.sh-msg.fail{color:var(--bad)}
 .result{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--bg);display:none}
 .result .score{font-size:22px;font-weight:700}
 .w{padding:0 2px;border-radius:4px}
@@ -83,7 +89,9 @@ body.player-open main{padding-bottom:calc(56vw + 80px)}
   .practice .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .practice .row .btn{min-height:44px;padding:8px 6px}
   .practice .row .btn.primary{grid-column:1/-1}
-  .practice .row .btn[data-play]{grid-column:1/-1}
+  .shadow .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .shadow .sh-adj{grid-template-columns:1fr 1fr}
+  .shadow .sh-adj .ko{grid-column:1/-1}
   #player-wrap{left:0;right:0;bottom:0;width:100%;border-radius:14px 14px 0 0;
     padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
   body.player-open main{padding-bottom:calc(56vw + 90px)}
@@ -242,20 +250,138 @@ function loadYT(){
   });
   return ytReady;
 }
+// start~end 구간을 재생하고, 끝나면 true (재생이 시작되지 않으면 false)
+let segWatch = null;
+async function playSegment(videoId, start, end, title){
+  $("#player-wrap").style.display = "block"; document.body.classList.add("player-open");
+  $("#player-title").textContent = title || "";
+  await loadYT();
+  clearInterval(segWatch);
+  if (!player) {
+    await new Promise(res => {
+      player = new YT.Player("player", {videoId,
+        playerVars:{start:Math.floor(start), end:Math.ceil(end), autoplay:1, rel:0, playsinline:1},
+        events:{onReady: res}});
+    });
+  } else {
+    player.loadVideoById({videoId, startSeconds:start, endSeconds:end});
+  }
+  return new Promise(res => {
+    const t0 = Date.now();
+    segWatch = setInterval(() => {
+      const st = player.getPlayerState?.(), ct = player.getCurrentTime?.() || 0;
+      if (ct >= end - 0.15 || st === YT.PlayerState.ENDED) { clearInterval(segWatch); player.pauseVideo(); res(true); }
+      else if (Date.now() - t0 > (end - start) * 1000 + 15000) { clearInterval(segWatch); res(false); }
+    }, 100);
+  });
+}
 async function playScene(videoId, startSec, title){
   if (location.protocol === "file:") {
     window.open(`https://youtu.be/${videoId}?t=${Math.floor(startSec)}`, "_blank"); return;
   }
-  $("#player-wrap").style.display = "block"; document.body.classList.add("player-open");
-  $("#player-title").textContent = title || "";
-  await loadYT();
-  const start = Math.max(0, Math.floor(startSec) - 1), end = start + 8;
-  clearTimeout(stopTimer);
-  if (!player) {
-    player = new YT.Player("player", {videoId, playerVars:{start, end, autoplay:1, rel:0, playsinline:1}});
-  } else {
-    player.loadVideoById({videoId, startSeconds:start, endSeconds:end});
+  const start = Math.max(0, Math.floor(startSec) - 1);
+  playSegment(videoId, start, start + 8, title);
+}
+$("#player-close").onclick = () => { clearInterval(segWatch); if (player) player.stopVideo(); $("#player-wrap").style.display = "none"; document.body.classList.remove("player-open"); };
+
+// ───────── 쉐도잉: 원본 듣기 → 바로 따라 말하기(녹음) → 원본과 내 목소리 번갈아 듣기 ─────────
+function loadOffsets(){ try { return JSON.parse(localStorage.getItem("shadowOffset") || "{}"); } catch { return {}; } }
+function shadowRange(sh){
+  // 받아쓰기 시각이 조금씩 어긋날 수 있어 문장 길이로 구간을 잡고, 이용자가 0.5초씩 조절
+  const off = loadOffsets()[sh.key] || 0;
+  const start = Math.max(0, sh.start - 0.3 + off);
+  const dur = Math.min(9, Math.max(2.5, words(sh.text).length * 0.38 + 1.2));
+  return {start, end: start + dur, dur};
+}
+let shadowBusy = false;
+function shadowUI(box, sh, stage, msg){
+  const r = shadowRange(sh);
+  const range = `<span class="ko">구간 ${r.start.toFixed(1)}~${r.end.toFixed(1)}초</span>`;
+  const adj = `<button class="btn" data-shift="-0.5">⏪ 0.5초</button><button class="btn" data-shift="0.5">0.5초 ⏩</button>`;
+  const after = stage === "done" ? `
+    <div class="row sh-btns">
+      <button class="btn" data-sh="orig">🎬 원본</button>
+      <button class="btn" data-sh="mine">🙋 내 목소리</button>
+      <button class="btn primary" data-sh="both">🔁 번갈아 듣기</button>
+      <button class="btn" data-sh="again">↺ 다시 하기</button>
+    </div>
+    <div class="tip">말투·리듬·끝 억양이 비슷한지 귀로 비교해 보세요. 3번 반복하면 훨씬 비슷해져요.</div>` : "";
+  box.innerHTML = `<div class="sh-msg ${stage}">${msg}</div>${after}
+    <div class="row sh-adj">${range}${adj}</div>
+    <div class="tip">대사가 잘리거나 다른 말이 섞이면 ⏪⏩로 구간을 옮기세요.</div>`;
+  box.style.display = "block";
+  // 휴대폰에서 아래쪽 영상 플레이어에 가리지 않게 올려 보이기
+  const wrap = $("#player-wrap");
+  if (wrap.style.display === "block") {
+    const pTop = wrap.getBoundingClientRect().top, b = box.getBoundingClientRect();
+    if (b.bottom > pTop - 8) window.scrollBy(0, b.bottom - pTop + 16);
   }
+}
+async function shadow(btn){
+  if (shadowBusy) return;
+  if (location.protocol === "file:") return alert("쉐도잉은 웹 주소(http)로 열어야 됩니다.");
+  if (!("MediaRecorder" in window) || !navigator.mediaDevices?.getUserMedia) return alert("이 브라우저는 녹음을 지원하지 않습니다.");
+  const blk = btn.closest(".practice"), box = blk.querySelector(".shadow");
+  const sh = blk._sh = JSON.parse(btn.dataset.shadow);
+  const r = shadowRange(sh);
+  shadowBusy = true;
+  try {
+    window.speechSynthesis?.cancel();
+    shadowUI(box, sh, "listen", "① 원본을 잘 들으세요…");
+    const ok = await playSegment(sh.video, r.start, r.end, sh.title);
+    if (!ok) { shadowUI(box, sh, "fail", "영상이 재생되지 않았어요. 아래 플레이어의 ▶를 한 번 누른 뒤 다시 해 보세요."); return; }
+    // 마이크는 원본이 끝난 뒤에 켠다 (아이폰은 마이크가 켜져 있으면 영상 소리가 작아짐)
+    let stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({audio:true}); }
+    catch { shadowUI(box, sh, "fail", "마이크 사용을 허용해 주세요."); return; }
+    const rec = new MediaRecorder(stream), chunks = [];
+    rec.ondataavailable = e => chunks.push(e.data);
+    const stopped = new Promise(res => rec.onstop = res);
+    rec.start();
+    const total = Math.ceil(r.dur + 1.5);
+    for (let s = total; s > 0; s--) {
+      shadowUI(box, sh, "rec", `② 🔴 지금 똑같이 따라 말하세요! <b>${s}</b>`);
+      await new Promise(res => setTimeout(res, 1000));
+    }
+    rec.stop(); await stopped;
+    stream.getTracks().forEach(t => t.stop());
+    if (blk._shUrl) URL.revokeObjectURL(blk._shUrl);
+    blk._shUrl = URL.createObjectURL(new Blob(chunks, {type: rec.mimeType}));
+    shadowUI(box, sh, "done", "③ 원본과 내 목소리를 비교해 보세요.");
+  } finally { shadowBusy = false; }
+}
+function playMine(blk){
+  return new Promise(res => {
+    if (!blk._shUrl) return res();
+    const a = new Audio(blk._shUrl); a.onended = res; a.onerror = res; a.play().catch(res);
+  });
+}
+async function shadowAction(btn){
+  const blk = btn.closest(".practice"), sh = blk._sh, box = blk.querySelector(".shadow");
+  if (!sh || shadowBusy) return;
+  const r = shadowRange(sh);
+  if (btn.dataset.shift) {
+    const o = loadOffsets(); o[sh.key] = Math.round(((o[sh.key] || 0) + +btn.dataset.shift) * 10) / 10;
+    try { localStorage.setItem("shadowOffset", JSON.stringify(o)); } catch {}
+    const r2 = shadowRange(sh);
+    shadowUI(box, sh, blk._shUrl ? "done" : "listen", "구간을 옮겼어요. 원본을 다시 들어 보세요.");
+    shadowBusy = true; try { await playSegment(sh.video, r2.start, r2.end, sh.title); } finally { shadowBusy = false; }
+    return;
+  }
+  const k = btn.dataset.sh;
+  if (k === "again") { const b = blk.querySelector("[data-shadow]"); return shadow(b); }
+  shadowBusy = true;
+  try {
+    if (k === "orig") await playSegment(sh.video, r.start, r.end, sh.title);
+    else if (k === "mine") await playMine(blk);
+    else if (k === "both") { await playSegment(sh.video, r.start, r.end, sh.title); await playMine(blk); }
+  } finally { shadowBusy = false; }
+}
+function sceneBtns(videoId, startSec, title, text, key){
+  if (!videoId) return "";
+  const sh = esc(JSON.stringify({video: videoId, start: +startSec || 0, title: title || "", text, key}));
+  return `<button class="btn" data-play="${esc(videoId)}" data-start="${startSec}" data-title="${esc(title || "")}">▶ 장면 보기</button>
+    <button class="btn" data-shadow="${sh}">🔁 쉐도잉</button>`;
 }
 $("#player-close").onclick = () => { if (player) player.stopVideo(); $("#player-wrap").style.display = "none"; document.body.classList.remove("player-open"); };
 
@@ -272,6 +398,7 @@ function practiceBlock(label, en, ko, key, extraBtns=""){
       <button class="btn" data-say="${esc(en)}" data-rate="0.7">🐢 천천히</button>
       <button class="btn primary" data-practice="${esc(en)}" data-key="${esc(key)}">🎙 따라 말하기</button>
     </div>
+    <div class="shadow"></div>
     <div class="result"><div class="body"></div><audio controls hidden style="margin-top:8px;width:100%"></audio></div>
   </div>`;
 }
@@ -280,7 +407,7 @@ function everydayCard(ch, e, i){
   const share = ch.corpus_size ? `<span class="badge share">원어민 유튜버 ${Math.round((e.native_share||0)*100)}% 사용</span>` : "";
   const scenes = (e.scenes || []).slice(0, 2).map((s, k) =>
     practiceBlock(`🎬 ${esc(ch.info?.title || ch.channel)}의 실제 대사`, s.quote, "", `${ch.channel}|${e.expression}|q${k}`,
-      `<button class="btn" data-play="${esc(s.video_id)}" data-start="${s.start_sec}" data-title="${esc(s.video_title)}">▶ 장면 보기</button>`)
+      sceneBtns(s.video_id, s.start_sec, s.video_title, s.quote, `${ch.channel}|${e.expression}|q${k}`))
   ).join("");
   return `<div class="card">
     <div class="top"><span class="expr">${i+1}. ${esc(e.expression)}</span>
@@ -299,7 +426,7 @@ function signatureCard(ch, s, i){
     <div class="meaning">${esc(s.meaning_ko)}</div>
     <p class="nuance">${esc(s.why_ko)}</p>
     ${practiceBlock(`🎬 ${esc(ch.info?.title || ch.channel)}의 실제 대사`, s.example_en, "", `${ch.channel}|sig|${s.phrase}`,
-      s.video_id ? `<button class="btn" data-play="${esc(s.video_id)}" data-start="${s.start_sec}" data-title="">▶ 장면 보기</button>` : "")}
+      sceneBtns(s.video_id, s.start_sec, "", s.example_en, `${ch.channel}|sig|${s.phrase}`))}
   </div>`;
 }
 
@@ -361,6 +488,8 @@ document.addEventListener("click", e => {
   else if (t.dataset.say) speak(t.dataset.say, +t.dataset.rate);
   else if (t.dataset.practice) practice(t, t.dataset.practice, t.dataset.key);
   else if (t.dataset.play) playScene(t.dataset.play, +t.dataset.start, t.dataset.title);
+  else if (t.dataset.shadow) shadow(t);
+  else if (t.dataset.sh || t.dataset.shift) shadowAction(t);
 });
 render.draw();
 
