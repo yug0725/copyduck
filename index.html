@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>유튜버 영어 표현</title>
+<meta name="description" content="좋아하는 유튜버가 실제로 쓰는 영어 표현을 배우고 따라 말해 보세요.">
+<meta name="theme-color" content="#2f6fec">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="영어 표현">
+<style>
+:root{
+  --bg:#f6f7f9; --card:#fff; --text:#1d2430; --sub:#5d6675; --line:#e3e6eb;
+  --accent:#2f6fec; --accent-soft:#e8f0fe; --good:#1f9d55; --good-soft:#e5f6ec;
+  --bad:#d64545; --bad-soft:#fdecec; --warn:#b7791f; --warn-soft:#fdf3e1;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#14171c; --card:#1d2128; --text:#e8ebf0; --sub:#9aa3b2; --line:#2e343d;
+    --accent:#6b9cff; --accent-soft:#22304a; --good:#4cc38a; --good-soft:#1c3328;
+    --bad:#ff7b7b; --bad-soft:#3a2224; --warn:#e3b04b; --warn-soft:#3a3020; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Malgun Gothic",sans-serif;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;padding-bottom:env(safe-area-inset-bottom)}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left));display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;margin-right:auto}
+select,button{font:inherit}
+select{font-size:16px;max-width:100%;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text)}
+main{max-width:860px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--sub);padding:6px 14px;border-radius:999px;cursor:pointer}
+.tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.note{color:var(--sub);font-size:13px;margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.expr{font-size:21px;font-weight:700}
+.badge{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.badge.share{background:var(--good-soft);color:var(--good)}
+.badge.best{background:var(--warn-soft);color:var(--warn)}
+.meaning{font-weight:600;margin:6px 0 2px}
+.nuance{color:var(--sub);margin:0 0 10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:8px;padding:6px 12px;cursor:pointer;touch-action:manipulation;min-height:40px}
+.btn:active{transform:scale(.97)}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.rec{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+.line{border-top:1px dashed var(--line);margin-top:12px;padding-top:12px}
+.label{font-size:12px;color:var(--sub);margin-bottom:2px}
+.sent{font-size:16px}
+.ko{color:var(--sub);font-size:14px}
+.result{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--bg);display:none}
+.result .score{font-size:22px;font-weight:700}
+.w{padding:0 2px;border-radius:4px}
+.w.ok{color:var(--good)}
+.w.miss{color:var(--bad);background:var(--bad-soft);text-decoration:underline wavy}
+.heard{color:var(--sub);font-size:13px;margin-top:4px}
+.tip{font-size:13px;margin-top:4px}
+#player-wrap{position:fixed;right:16px;bottom:16px;width:min(420px,calc(100vw - 32px));background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.25);padding:8px;display:none;z-index:10}
+#player-wrap .bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--sub);margin-bottom:6px;gap:8px}
+#player-box{position:relative;width:100%;aspect-ratio:16/9}
+#player-box iframe,#player{position:absolute;inset:0;width:100%;height:100%}
+.empty{color:var(--sub);text-align:center;padding:40px 0}
+a{color:var(--accent)}
+.install{display:none;margin:0 0 14px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);color:var(--text);font-size:14px}
+.install .row{margin-top:6px}
+body.player-open main{padding-bottom:calc(56vw + 80px)}
+
+/* ── 휴대폰 ── */
+@media (max-width:600px){
+  header h1{font-size:16px}
+  header select{flex:1 1 100%}
+  main{padding:12px 12px 24px}
+  .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -12px 12px;padding:0 12px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;padding:8px 14px}
+  .card{padding:14px;border-radius:12px}
+  .expr{font-size:20px}
+  .practice .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .practice .row .btn{min-height:44px;padding:8px 6px}
+  .practice .row .btn.primary{grid-column:1/-1}
+  .practice .row .btn[data-play]{grid-column:1/-1}
+  #player-wrap{left:0;right:0;bottom:0;width:100%;border-radius:14px 14px 0 0;
+    padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+  body.player-open main{padding-bottom:calc(56vw + 90px)}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎧 유튜버 영어 표현</h1>
+  <select id="channel" aria-label="유튜버 선택"></select>
+</header>
+<main>
+  <div class="install" id="install"></div>
+  <div class="tabs" id="tabs"></div>
+  <p class="note" id="note"></p>
+  <div id="list"></div>
+</main>
+
+<div id="player-wrap">
+  <div class="bar"><span id="player-title"></span><button class="btn" id="player-close">닫기</button></div>
+  <div id="player-box"><div id="player"></div></div>
+</div>
+
+<script src="data.js"></script>
+<script>
+const DATA = window.APP_DATA || {channels: [], trends: null};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const TYPE_KO = {idiom:"관용구", phrasal_verb:"구동사", spoken_expression:"구어 표현", slang:"슬랭"};
+
+// ───────── 저장 (이 브라우저에만) ─────────
+function loadBest(){ try { return JSON.parse(localStorage.getItem("best") || "{}"); } catch { return {}; } }
+function saveBest(key, score){
+  try { const b = loadBest(); if (!(b[key] >= score)) { b[key] = score; localStorage.setItem("best", JSON.stringify(b)); } } catch {}
+}
+
+// ───────── 발음 채점: 들린 단어 vs 목표 문장 (순서 유지 최장 일치) ─────────
+function words(s){
+  return String(s).toLowerCase().replace(/[’‘]/g,"'").match(/[a-z0-9]+(?:'[a-z]+)?/g) || [];
+}
+function align(target, heard){
+  const t = words(target), h = words(heard), n = t.length, m = h.length;
+  const dp = Array.from({length:n+1}, () => new Array(m+1).fill(0));
+  for (let i=n-1;i>=0;i--) for (let j=m-1;j>=0;j--)
+    dp[i][j] = t[i]===h[j] ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
+  const ok = new Array(n).fill(false);
+  let i=0,j=0;
+  while (i<n && j<m){
+    if (t[i]===h[j]) { ok[i]=true; i++; j++; }
+    else if (dp[i+1][j] >= dp[i][j+1]) i++; else j++;
+  }
+  const hit = ok.filter(Boolean).length;
+  return {score: n ? Math.round(hit/n*100) : 0, ok, extra: Math.max(0, m-hit)};
+}
+function markTarget(target, ok){
+  // 원문 표기는 살리고, 단어마다 맞음/놓침 색칠
+  // 단어를 먼저 나눈 뒤 조각마다 이스케이프 (먼저 이스케이프하면 It's → It&#39;s 로 쪼개짐)
+  let k = 0, out = "", last = 0;
+  for (const m of String(target).matchAll(/[A-Za-z0-9]+(?:['’][A-Za-z]+)?/g)) {
+    out += esc(target.slice(last, m.index)) + `<span class="w ${ok[k++] ? "ok" : "miss"}">${esc(m[0])}</span>`;
+    last = m.index + m[0].length;
+  }
+  return out + esc(target.slice(last));
+}
+function feedback(r){
+  if (r.score >= 90) return "아주 좋아요! 원어민이 알아들을 수 있는 발음입니다.";
+  if (r.score >= 70) return "거의 다 왔어요. 빨간 단어만 다시 들어 보고 따라 해 보세요.";
+  if (r.score >= 40) return "절반 정도 전달됐어요. 천천히 듣기로 끊어 읽는 곳을 따라 해 보세요.";
+  return "잘 안 들렸어요. 마이크에 가까이, 문장을 천천히 또박또박 말해 보세요.";
+}
+
+// ───────── 듣기 (브라우저 음성) ─────────
+function speak(text, rate){
+  if (!("speechSynthesis" in window)) return alert("이 브라우저는 읽어 주기를 지원하지 않습니다.");
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US"; u.rate = rate;
+  const v = speechSynthesis.getVoices().find(v => v.lang.replace("_", "-") === "en-US");
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+
+// ───────── 말하기: 음성 인식 + 내 목소리 녹음 ─────────
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const IS_ANDROID = /Android/.test(navigator.userAgent);
+// 휴대폰은 마이크를 녹음과 음성 인식이 동시에 못 쓰는 경우가 많아서, 녹음 다시 듣기는 PC에서만
+const CAN_RECORD = !(IS_IOS || IS_ANDROID) && "MediaRecorder" in window;
+const SR_ERR = {
+  "not-allowed": "마이크 사용을 허용해 주세요. (주소창 옆 자물쇠 → 마이크 허용)",
+  "service-not-allowed": IS_IOS ? "아이폰 설정 → Siri에서 'Siri 및 받아쓰기'를 켜야 발음 연습이 됩니다." : "이 브라우저에서 음성 인식을 쓸 수 없습니다.",
+  "audio-capture": "마이크를 찾지 못했어요. 다른 앱이 마이크를 쓰고 있는지 확인해 주세요.",
+  "network": "인터넷 연결을 확인해 주세요. 음성 인식은 인터넷이 필요합니다.",
+};
+let active = null;
+async function practice(btn, target, key){
+  if (!SR) return alert(IS_IOS ? "아이폰은 사파리에서 발음 연습이 됩니다." : "발음 연습은 크롬·엣지·삼성 인터넷 최신 버전에서 됩니다.");
+  if (active) { active.stop(); return; }
+  window.speechSynthesis?.cancel();
+  const box = btn.closest(".practice").querySelector(".result");
+  let recorder = null, chunks = [];
+  if (CAN_RECORD) try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = () => {
+      stream.getTracks().forEach(t => t.stop());
+      const a = box.querySelector("audio");
+      if (a && chunks.length) { a.src = URL.createObjectURL(new Blob(chunks, {type: recorder.mimeType})); a.hidden = false; }
+    };
+    recorder.start();
+  } catch { /* 녹음이 안 돼도 인식은 시도 */ }
+
+  const rec = new SR();
+  rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 5;
+  active = rec;
+  btn.textContent = "■ 그만 (말하는 중…)"; btn.classList.add("rec");
+  let best = null;
+  rec.onresult = e => {
+    for (const alt of e.results[0]) {
+      const r = align(target, alt.transcript);
+      if (!best || r.score > best.score) best = {...r, heard: alt.transcript};
+    }
+  };
+  let errMsg = "";
+  rec.onerror = e => { errMsg = SR_ERR[e.error] || ""; };
+  // 휴대폰에서 말이 끝나도 인식이 안 멈추는 경우 대비: 문장 길이에 맞춰 자동 종료
+  const limit = setTimeout(() => { try { rec.stop(); } catch {} }, 4000 + words(target).length * 600);
+  rec.onend = () => {
+    clearTimeout(limit);
+    active = null; btn.textContent = "🎙 따라 말하기"; btn.classList.remove("rec");
+    if (recorder && recorder.state !== "inactive") recorder.stop();
+    box.style.display = "block";
+    if (!best) {
+      box.querySelector(".body").innerHTML = `<div class="tip">${esc(errMsg || "아무 말도 들리지 않았어요. 다시 눌러서 말해 보세요.")}</div>`;
+      return;
+    }
+    saveBest(key, best.score);
+    box.querySelector(".body").innerHTML =
+      `<div class="score">${best.score}점</div>
+       <div class="sent">${markTarget(target, best.ok)}</div>
+       <div class="heard">들린 말: “${esc(best.heard)}”</div>
+       <div class="tip">${feedback(best)}</div>`;
+    render.refreshBadges();
+  };
+  rec.start();
+}
+
+// ───────── 유튜브 장면 재생 (영상은 저장하지 않고 공식 플레이어로 해당 구간만) ─────────
+let ytReady = null, player = null, stopTimer = null;
+function loadYT(){
+  if (ytReady) return ytReady;
+  ytReady = new Promise(res => {
+    window.onYouTubeIframeAPIReady = res;
+    const s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(s);
+  });
+  return ytReady;
+}
+async function playScene(videoId, startSec, title){
+  if (location.protocol === "file:") {
+    window.open(`https://youtu.be/${videoId}?t=${Math.floor(startSec)}`, "_blank"); return;
+  }
+  $("#player-wrap").style.display = "block"; document.body.classList.add("player-open");
+  $("#player-title").textContent = title || "";
+  await loadYT();
+  const start = Math.max(0, Math.floor(startSec) - 1), end = start + 8;
+  clearTimeout(stopTimer);
+  if (!player) {
+    player = new YT.Player("player", {videoId, playerVars:{start, end, autoplay:1, rel:0, playsinline:1}});
+  } else {
+    player.loadVideoById({videoId, startSeconds:start, endSeconds:end});
+  }
+}
+$("#player-close").onclick = () => { if (player) player.stopVideo(); $("#player-wrap").style.display = "none"; document.body.classList.remove("player-open"); };
+
+// ───────── 화면 ─────────
+function practiceBlock(label, en, ko, key, extraBtns=""){
+  const best = loadBest()[key];
+  return `<div class="line practice">
+    <div class="label">${label} ${best != null ? `<span class="badge best" data-best="${esc(key)}">최고 ${best}점</span>` : `<span class="badge best" data-best="${esc(key)}" hidden></span>`}</div>
+    <div class="sent">${esc(en)}</div>
+    ${ko ? `<div class="ko">${esc(ko)}</div>` : ""}
+    <div class="row" style="margin-top:8px">
+      ${extraBtns}
+      <button class="btn" data-say="${esc(en)}" data-rate="1">🔊 듣기</button>
+      <button class="btn" data-say="${esc(en)}" data-rate="0.7">🐢 천천히</button>
+      <button class="btn primary" data-practice="${esc(en)}" data-key="${esc(key)}">🎙 따라 말하기</button>
+    </div>
+    <div class="result"><div class="body"></div><audio controls hidden style="margin-top:8px;width:100%"></audio></div>
+  </div>`;
+}
+
+function everydayCard(ch, e, i){
+  const share = ch.corpus_size ? `<span class="badge share">원어민 유튜버 ${Math.round((e.native_share||0)*100)}% 사용</span>` : "";
+  const scenes = (e.scenes || []).slice(0, 2).map((s, k) =>
+    practiceBlock(`🎬 ${esc(ch.info?.title || ch.channel)}의 실제 대사`, s.quote, "", `${ch.channel}|${e.expression}|q${k}`,
+      `<button class="btn" data-play="${esc(s.video_id)}" data-start="${s.start_sec}" data-title="${esc(s.video_title)}">▶ 장면 보기</button>`)
+  ).join("");
+  return `<div class="card">
+    <div class="top"><span class="expr">${i+1}. ${esc(e.expression)}</span>
+      <span class="badge">${TYPE_KO[e.type] || esc(e.type)}</span>${share}
+      <span class="badge">${e.count}회 · 영상 ${e.video_count}개</span></div>
+    <div class="meaning">${esc(e.meaning_ko)}</div>
+    <p class="nuance">${esc(e.nuance_ko)}</p>
+    ${scenes}
+    ${practiceBlock("✏️ 일상 예문", e.example_en, e.example_ko, `${ch.channel}|${e.expression}|ex`)}
+  </div>`;
+}
+
+function signatureCard(ch, s, i){
+  return `<div class="card">
+    <div class="top"><span class="expr">${i+1}. ${esc(s.phrase)}</span>${s.learnable ? "" : `<span class="badge">말버릇 (따라 쓰기 비추천)</span>`}</div>
+    <div class="meaning">${esc(s.meaning_ko)}</div>
+    <p class="nuance">${esc(s.why_ko)}</p>
+    ${practiceBlock(`🎬 ${esc(ch.info?.title || ch.channel)}의 실제 대사`, s.example_en, "", `${ch.channel}|sig|${s.phrase}`,
+      s.video_id ? `<button class="btn" data-play="${esc(s.video_id)}" data-start="${s.start_sec}" data-title="">▶ 장면 보기</button>` : "")}
+  </div>`;
+}
+
+function trendCard(t, i, kind){
+  const where = kind === "song" ? `<div class="label">🎵 ${t.rank}위 ${esc(t.song)} - ${esc(t.artist)} · ${esc(t.where_ko || "")}</div>` : "";
+  const usage = t.usage === "friends_only" ? `<span class="badge">친구끼리만</span>` : `<span class="badge share">어디서나 OK</span>`;
+  const src = (t.source_urls || []).slice(0, 2).map((u, k) => `<a href="${esc(u)}" target="_blank" rel="noopener">출처${k+1}</a>`).join(" · ");
+  return `<div class="card">
+    ${where}
+    <div class="top"><span class="expr">${i+1}. ${esc(t.expression)}</span>${usage}</div>
+    <div class="meaning">${esc(t.meaning_ko)}</div>
+    <p class="nuance">${esc(t.nuance_ko)}${t.origin_ko ? " " + esc(t.origin_ko) : ""}</p>
+    ${src ? `<div class="ko">${src}</div>` : ""}
+    ${practiceBlock("✏️ 예문", t.example_en, t.example_ko, `trend|${t.expression}`)}
+  </div>`;
+}
+
+const render = {
+  tab: "everyday",
+  refreshBadges(){
+    const b = loadBest();
+    document.querySelectorAll("[data-best]").forEach(el => {
+      const v = b[el.dataset.best]; if (v != null) { el.textContent = `최고 ${v}점`; el.hidden = false; }
+    });
+  },
+  draw(){
+    const ch = DATA.channels[$("#channel").value];
+    const tabs = [["everyday","📘 일상 필수 표현"],["signature","⭐ 시그니처"],["trends","🔥 이번 주 트렌드"]];
+    $("#tabs").innerHTML = tabs.map(([k,l]) => `<button class="tab ${k===this.tab?"on":""}" data-tab="${k}">${l}</button>`).join("");
+    let html = "", note = "";
+    if (this.tab === "trends") {
+      const t = DATA.trends;
+      if (!t) html = `<div class="empty">이번 주 트렌드 표현은 준비 중입니다.</div>`;
+      else {
+        note = `${t.week} 기준 미국에서 유행하는 표현과 인기곡 속 표현입니다. 가사는 싣지 않습니다.`;
+        html = (t.slang||[]).map((x,i)=>trendCard(x,i,"slang")).join("") + (t.songs||[]).map((x,i)=>trendCard(x,i,"song")).join("");
+      }
+    } else if (!ch) {
+      html = `<div class="empty">분석한 유튜버가 없습니다.<br><code>python main.py 채널이름</code> 을 먼저 실행하세요.</div>`;
+    } else if (this.tab === "everyday") {
+      note = `${ch.info?.title || ch.channel} 영상 ${ch.videos_analyzed}개에서 뽑은 표현입니다.` +
+        (ch.corpus_size ? ` 다른 원어민 유튜버 ${ch.corpus_size}명과 비교해 검증했습니다.` : " (아직 비교용 말뭉치가 없어 원어민 사용률은 표시하지 않습니다.)");
+      html = (ch.everyday||[]).map((e,i)=>everydayCard(ch,e,i)).join("") || `<div class="empty">표현이 없습니다.</div>`;
+    } else {
+      note = "이 유튜버는 자주 쓰는데 다른 유튜버들은 잘 안 쓰는 말버릇입니다.";
+      html = (ch.signatures||[]).map((s,i)=>signatureCard(ch,s,i)).join("") ||
+        `<div class="empty">아직 시그니처 표현이 없습니다.<br>비교용 말뭉치가 쌓이면 나타납니다. (<code>python corpus.py build</code>)</div>`;
+    }
+    $("#note").textContent = note;
+    $("#list").innerHTML = html;
+  }
+};
+
+$("#channel").innerHTML = DATA.channels.map((c,i)=>`<option value="${i}">${esc(c.info?.title || c.channel)}</option>`).join("") || `<option>유튜버 없음</option>`;
+$("#channel").onchange = () => render.draw();
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.tab) { render.tab = t.dataset.tab; render.draw(); }
+  else if (t.dataset.say) speak(t.dataset.say, +t.dataset.rate);
+  else if (t.dataset.practice) practice(t, t.dataset.practice, t.dataset.key);
+  else if (t.dataset.play) playScene(t.dataset.play, +t.dataset.start, t.dataset.title);
+});
+render.draw();
+
+// ───────── 홈 화면에 추가 (앱처럼 쓰기) ─────────
+if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+(function installHint(){
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  let dismissed = false; try { dismissed = localStorage.getItem("installDismissed") === "1"; } catch {}
+  if (standalone || dismissed) return;
+  const box = $("#install");
+  const close = `<button class="btn" id="install-close">닫기</button>`;
+  const show = (html) => { box.innerHTML = html; box.style.display = "block";
+    $("#install-close").onclick = () => { box.style.display = "none"; try { localStorage.setItem("installDismissed", "1"); } catch {} }; };
+  if (IS_IOS) {
+    show(`📲 앱처럼 쓰려면 사파리 아래쪽 <b>공유 버튼</b> → <b>홈 화면에 추가</b>를 누르세요.<div class="row">${close}</div>`);
+  } else {
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault();
+      show(`📲 홈 화면에 추가하면 앱처럼 바로 열 수 있어요.<div class="row"><button class="btn primary" id="install-go">홈 화면에 추가</button>${close}</div>`);
+      $("#install-go").onclick = async () => { e.prompt(); await e.userChoice; box.style.display = "none"; };
+    });
+  }
+})();
+</script>
+</body>
+</html>
