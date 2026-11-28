@@ -576,7 +576,7 @@ function practiceBlock(label, en, ko, key, extraBtns=""){
 function othersBlock(ch, e){
   const os = e.others || [];
   if (!os.length) return "";
-  const head = PRINCESS.includes(ch.channel) ? "💁‍♀️ 다른 언니들은 이렇게 말해요" : "💁 비슷한 유튜버는 이렇게 말해요";
+  const head = PRINCESS.includes(ch.channel) ? "👸 다른 공주님들은 이렇게 말해요" : "💁 비슷한 유튜버는 이렇게 말해요";
   return `<div class="line others">
     <div class="label">${head} <span class="ko">· 같은 성별·나라, 나이대 가까운 순</span></div>
     ${os.map(o => `<div class="other-row">
