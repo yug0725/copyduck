@@ -102,6 +102,9 @@ body.princess .scene-thumb{border-radius:14px;box-shadow:0 3px 12px rgba(226,88,
 .tip{font-size:13px;margin-top:4px}
 #player-wrap{position:fixed;right:16px;bottom:16px;width:min(420px,calc(100vw - 32px));background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.25);padding:8px;display:none;z-index:10}
 #player-wrap .bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--sub);margin-bottom:6px;gap:8px}
+#player-title{min-width:0;display:flex;flex-direction:column}
+#player-title .listen-for{color:var(--text);font-weight:700;font-size:14px;line-height:1.35}
+#player-title .vt{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #player-box{position:relative;width:100%;aspect-ratio:16/9}
 #player-box iframe,#player{position:absolute;inset:0;width:100%;height:100%}
 .empty{color:var(--sub);text-align:center;padding:40px 0}
@@ -439,12 +442,14 @@ async function playSegment(videoId, start, end, title){
     }, 100);
   });
 }
-async function playScene(videoId, startSec, title){
+async function playScene(videoId, startSec, title, quote = ""){
   if (location.protocol === "file:") {
     window.open(`https://youtu.be/${videoId}?t=${Math.floor(startSec)}`, "_blank"); return;
   }
-  const start = Math.max(0, Math.floor(startSec) - 1);
-  playSegment(videoId, start, start + 8, title);
+  // 시각이 1~2초 어긋나도 대사가 잘리지 않게 2초 앞부터 10초
+  const start = Math.max(0, Math.floor(startSec) - 2);
+  playSegment(videoId, start, start + 10, title);
+  if (quote) $("#player-title").innerHTML = `<span class="listen-for">🎧 “${esc(quote)}”</span><span class="vt">${esc(title || "")}</span>`;
 }
 $("#player-close").onclick = () => { clearInterval(segWatch); if (player) player.stopVideo(); $("#player-wrap").style.display = "none"; document.body.classList.remove("player-open"); };
 
@@ -843,7 +848,12 @@ document.addEventListener("click", e => {
   if (t.dataset.tab) { render.tab = t.dataset.tab; render.draw(); }
   else if (t.dataset.say) speak(t.dataset.say, +t.dataset.rate);
   else if (t.dataset.practice) practice(t, t.dataset.practice, t.dataset.key);
-  else if (t.dataset.play) playScene(t.dataset.play, +t.dataset.start, t.dataset.title);
+  else if (t.dataset.play) {
+    // 이 장면에서 들어야 할 문장을 플레이어 위에 보여 줌
+    const q = t.closest(".other-row")?.querySelector(".other-quote")?.textContent.replace(/^“|”$/g, "")
+      || t.closest(".practice")?.querySelector(".sent")?.textContent || "";
+    playScene(t.dataset.play, +t.dataset.start, t.dataset.title, q);
+  }
   else if (t.dataset.seen) { markSeen(t.dataset.seen); render.draw(); }
   else if (t.dataset.review) { reviewItem(t.dataset.review, t.dataset.ok === "1"); render.draw(); }
   else if (t.dataset.more) {
