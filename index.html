@@ -63,6 +63,13 @@ main{max-width:860px;margin:0 auto;padding:16px}
 .scene-info{display:flex;flex-direction:column;gap:3px;min-width:0}
 .scene-title{font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .scene-cap{color:var(--sub);font-size:12px}
+.other-row{display:flex;gap:10px;align-items:center;padding:8px 0}
+.other-row + .other-row{border-top:1px solid var(--line)}
+.scene-thumb.small{flex:0 0 96px}
+.scene-thumb.small .play{width:26px;height:26px;font-size:11px}
+.other-info{min-width:0;font-size:13px}
+.other-quote{font-size:14px;line-height:1.45;margin-top:2px}
+body.princess .other-quote{font-family:"Playfair Display",Georgia,serif;font-style:italic}
 body.princess .scene-thumb{border-radius:14px;box-shadow:0 3px 12px rgba(226,88,154,.25)}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .stats div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
@@ -502,6 +509,22 @@ function practiceBlock(label, en, ko, key, extraBtns=""){
   </div>`;
 }
 
+// 💁 같은 표현을 비슷한 유튜버(성별·나라·나이대)는 어떻게 말하는지: 억양 비교용
+function othersBlock(ch, e){
+  const os = e.others || [];
+  if (!os.length) return "";
+  const head = PRINCESS.includes(ch.channel) ? "💁‍♀️ 다른 언니들은 이렇게 말해요" : "💁 비슷한 유튜버는 이렇게 말해요";
+  return `<div class="line others">
+    <div class="label">${head} <span class="ko">· 같은 성별·나라, 나이대 가까운 순</span></div>
+    ${os.map(o => `<div class="other-row">
+      <button class="scene-thumb small" data-play="${esc(o.video_id)}" data-start="${o.start_sec}" data-title="${esc(o.video_title)}" aria-label="${esc(o.name)} 장면 보기">
+        <img src="https://i.ytimg.com/vi/${esc(o.video_id)}/mqdefault.jpg" alt="" loading="lazy"><span class="play">▶</span></button>
+      <div class="other-info"><div class="other-who"><b>${esc(o.name)}</b> <span class="ko">${esc(o.tag)}</span></div>
+        <div class="other-quote">“${esc(o.quote)}”</div></div>
+    </div>`).join("")}
+  </div>`;
+}
+
 function everydayCard(ch, e, i, footer = ""){
   const share = ch.corpus_size ? `<span class="badge share">원어민 유튜버 ${Math.round((e.native_share||0)*100)}% 사용</span>` : "";
   const scenes = (e.scenes || []).slice(0, 2).map((s, k) =>
@@ -515,6 +538,7 @@ function everydayCard(ch, e, i, footer = ""){
     <div class="meaning">${esc(e.meaning_ko)}</div>
     <p class="nuance">${esc(e.nuance_ko)}</p>
     ${scenes}
+    ${othersBlock(ch, e)}
     ${practiceBlock("✏️ 일상 예문", e.example_en, e.example_ko, `${ch.channel}|${e.expression}|ex`)}
     ${footer}
   </div>`;
